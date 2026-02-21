@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.ezbizservices/seo-marketing",
   "title": "EzBiz SEO & Marketing Analysis",
-  "description": "AI-powered SEO and marketing intelligence — keyword research, SERP analysis, backlink checking, and content optimization for any website.",
+  "description": "AI-powered SEO and marketing: keyword research, SERP analysis, and content optimization tools.",
   "version": "1.0.0",
   "remotes": [
     {
