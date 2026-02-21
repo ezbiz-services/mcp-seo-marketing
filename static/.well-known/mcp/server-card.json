@@ -1,34 +1,34 @@
 {
   "serverInfo": {
-    "name": "EzBiz Business Intelligence",
-    "description": "AI-powered business intelligence MCP server. Competitive analysis, web presence scoring, review analysis, and market research — available via the Model Context Protocol.",
+    "name": "EzBiz SEO & Marketing Analysis",
+    "description": "AI-powered SEO and marketing tools via MCP. Keyword research, SERP analysis, backlink checking, and content optimization for any website.",
     "version": "1.0.0",
-    "homepage": "https://mcp.ezbizservices.com",
+    "homepage": "https://seo.ezbizservices.com",
     "transport": "streamable-http",
-    "endpoint": "https://mcp.ezbizservices.com/mcp"
+    "endpoint": "https://seo.ezbizservices.com/mcp"
   },
   "tools": [
     {
-      "name": "analyze_competitors",
-      "description": "Analyze the competitive landscape for a business. Returns competitor profiles, market positioning, strengths/weaknesses, and strategic recommendations."
+      "name": "keyword_research",
+      "description": "Research keyword opportunities — search volume indicators, difficulty estimates, related terms, and content suggestions."
     },
     {
-      "name": "score_web_presence",
-      "description": "Score a website's online presence (0-100) across SEO, performance, content, social media, and trust signals."
+      "name": "analyze_serp",
+      "description": "Analyze search engine results for a query — top ranking pages, content patterns, SERP features, and ranking opportunity assessment."
     },
     {
-      "name": "analyze_reviews",
-      "description": "Analyze a business's online reviews and reputation. Returns sentiment analysis, key themes, and recommendations."
+      "name": "check_backlinks",
+      "description": "Analyze a website's backlink profile — referring domains, anchor text patterns, link quality indicators, and link building opportunities."
     },
     {
-      "name": "market_research",
-      "description": "Conduct market research on an industry. Returns market size, trends, opportunities, and customer segments."
+      "name": "optimize_content",
+      "description": "Analyze and optimize content for SEO — keyword density, readability, structure, meta tags, and actionable improvement suggestions."
     }
   ],
   "authentication": {
     "type": "api-key",
     "header": "X-API-Key",
-    "signupUrl": "https://mcp.ezbizservices.com/signup"
+    "signupUrl": "https://seo.ezbizservices.com/signup"
   },
   "pricing": {
     "free": { "price": 0, "requestsPerMonth": 10 },
