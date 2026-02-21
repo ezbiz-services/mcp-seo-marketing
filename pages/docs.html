@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docs — EzBiz SEO & Marketing Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<nav>
+  <div class="container">
+    <a href="/" class="logo"><span>EzBiz</span> SEO & Marketing Analysis</a>
+    <div class="nav-links">
+      <a href="/docs">Docs</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/signup" class="btn-nav">Get Free API Key</a>
+    </div>
+  </div>
+</nav>
+<div class="container docs-container">
+  <h1>Documentation</h1>
+  <h2>Connection</h2>
+  <p>Server URL: <code>https://seo.ezbizservices.com/mcp</code></p>
+  <p>Auth: Pass your API key as <code>X-API-Key</code> header or <code>api_key</code> query parameter.</p>
+
+  <h2>Tools</h2>
+  <div class="docs-tools"><h3> keyword_research<br>Research keyword opportunities for a business — search volume indicators, difficulty estimates, related terms, and content suggestions.<br><br><strong>Parameters:<strong><br>  - <strong>seed_keyword<strong> (string): Primary keyword or topic to research<br>  - <strong>industry<strong> (string, optional): Business industry or niche<br>  - <strong>location<strong> (string, optional): Target geographic location<br><br><h3> analyze_serp<br>Analyze search engine results for a query — top ranking pages, content patterns, SERP features, and ranking opportunity assessment.<br><br><strong>Parameters:<strong><br>  - <strong>query<strong> (string): Search query to analyze<br>  - <strong>num_results<strong> (number, optional): Number of results to analyze (max 10)<br><br><h3> check_backlinks<br>Analyze a website's backlink profile — referring domains, anchor text patterns, link quality indicators, and link building opportunities.<br><br><strong>Parameters:<strong><br>  - <strong>url<strong> (string): Website URL to analyze<br>  - <strong>competitor_urls<strong> (string, optional): Comma-separated competitor URLs for comparison<br><br><h3> optimize_content<br>Analyze and optimize content for SEO — keyword density, readability, structure, meta tags, and actionable improvement suggestions.<br><br><strong>Parameters:<strong><br>  - <strong>url<strong> (string): URL of the page to optimize<br>  - <strong>target_keyword<strong> (string): Primary keyword to optimize for</div>
+
+  <h2>API Endpoints</h2>
+  <ul>
+    <li><code>POST /mcp</code> — MCP protocol endpoint</li>
+    <li><code>POST /api/keys/signup</code> — Create free API key (body: {name, email})</li>
+    <li><code>GET /api/keys/usage?key=YOUR_KEY</code> — Check usage</li>
+    <li><code>GET /api/pricing</code> — View pricing tiers</li>
+    <li><code>GET /health</code> — Health check</li>
+  </ul>
+</div>
+<footer><div class="container"><p>&copy; 2026 EzBiz Services.</p></div></footer>
+</body>
+</html>

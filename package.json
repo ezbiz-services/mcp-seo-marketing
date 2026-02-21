@@ -1,0 +1,15 @@
+{
+  "name": "@ezbiz/mcp-seo-marketing",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AI-powered SEO and marketing intelligence — keyword research, SERP analysis, backlink checking, and content optimization for any website.",
+  "scripts": {
+    "start": "bun run server.ts",
+    "dev": "bun --watch run server.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.0",
+    "cheerio": "^1.0.0",
+    "zod": "^3.24.0"
+  }
+}
