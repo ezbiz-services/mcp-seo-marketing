@@ -7,17 +7,43 @@
   <meta name="description" content="AI-powered SEO and marketing intelligence — keyword research, SERP analysis, backlink checking, and content optimization for any website.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v=2">
 </head>
 <body>
 
 <nav>
   <div class="container">
-    <a href="/" class="logo"><span>EzBiz</span> SEO & Marketing Analysis</a>
+    <a href="/" class="logo"><span>EzBiz</span> SEO &amp; Marketing Analysis</a>
+    <button class="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
     <div class="nav-links">
+      <button class="mega-trigger" type="button">Tools <svg class="caret" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <a href="/docs">Docs</a>
       <a href="/pricing">Pricing</a>
       <a href="/signup" class="btn-nav">Get Free API Key</a>
+    </div>
+  </div>
+  <div class="mega-panel">
+    <div class="container">
+      <div class="mega-grid">
+        <a href="/tools/keyword-research" class="mega-card blue">
+          <div class="mega-name">Keyword Research</div>
+          <div class="mega-desc">Discover high-value keywords and gaps</div>
+        </a>
+        <a href="/tools/analyze-serp" class="mega-card purple">
+          <div class="mega-name">SERP Analysis</div>
+          <div class="mega-desc">Analyze search results and ranking factors</div>
+        </a>
+        <a href="/tools/check-backlinks" class="mega-card green">
+          <div class="mega-name">Backlink Checker</div>
+          <div class="mega-desc">Audit backlink profiles and opportunities</div>
+        </a>
+        <a href="/tools/optimize-content" class="mega-card orange">
+          <div class="mega-name">Content Optimizer</div>
+          <div class="mega-desc">AI-powered content improvement tips</div>
+        </a>
+      </div>
     </div>
   </div>
 </nav>
@@ -34,31 +60,31 @@
   </div>
 </section>
 
-<section class="features">
+<section class="features" id="tools">
   <div class="container">
     <h2>4 AI-powered tools, one server</h2>
     <p class="section-sub">Each tool combines real-time web data with AI analysis to deliver actionable insights.</p>
     <div class="feature-grid">
-      <div class="feature-card">
+      <a href="/tools/keyword-research" class="feature-card" style="text-decoration:none;color:inherit;">
         <div class="icon blue">&#128269;</div>
         <h3>Keyword Research</h3>
         <p>Research keyword opportunities for a business — search volume indicators, difficulty estimates, related terms, and content suggestions.</p>
-      </div>
-      <div class="feature-card">
+      </a>
+      <a href="/tools/analyze-serp" class="feature-card" style="text-decoration:none;color:inherit;">
         <div class="icon purple">&#127760;</div>
         <h3>Analyze Serp</h3>
         <p>Analyze search engine results for a query — top ranking pages, content patterns, SERP features, and ranking opportunity assessment.</p>
-      </div>
-      <div class="feature-card">
+      </a>
+      <a href="/tools/check-backlinks" class="feature-card" style="text-decoration:none;color:inherit;">
         <div class="icon green">&#128200;</div>
         <h3>Check Backlinks</h3>
         <p>Analyze a website's backlink profile — referring domains, anchor text patterns, link quality indicators, and link building opportunities.</p>
-      </div>
-      <div class="feature-card">
+      </a>
+      <a href="/tools/optimize-content" class="feature-card" style="text-decoration:none;color:inherit;">
         <div class="icon orange">&#128161;</div>
         <h3>Optimize Content</h3>
         <p>Analyze and optimize content for SEO — keyword density, readability, structure, meta tags, and actionable improvement suggestions.</p>
-      </div>
+      </a>
     </div>
   </div>
 </section>
@@ -90,5 +116,66 @@
   </div>
 </footer>
 
+<script>
+(function(){
+  var trigger = document.querySelector('.mega-trigger');
+  var panel = document.querySelector('.mega-panel');
+  var toggle = document.querySelector('.nav-toggle');
+  var links = document.querySelector('.nav-links');
+  if (!trigger || !panel) return;
+
+  trigger.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    panel.classList.toggle('open');
+    trigger.classList.toggle('active');
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!panel.contains(e.target) && !trigger.contains(e.target)) {
+      panel.classList.remove('open');
+      trigger.classList.remove('active');
+    }
+    if (toggle && links && !links.contains(e.target) && !toggle.contains(e.target)) {
+      links.classList.remove('mobile-open');
+      toggle.classList.remove('open');
+    }
+  });
+
+  var hoverTimeout;
+  trigger.addEventListener('mouseenter', function() {
+    if (window.innerWidth > 768) {
+      clearTimeout(hoverTimeout);
+      panel.classList.add('open');
+      trigger.classList.add('active');
+    }
+  });
+  function scheduleClose() {
+    hoverTimeout = setTimeout(function() {
+      panel.classList.remove('open');
+      trigger.classList.remove('active');
+    }, 250);
+  }
+  trigger.addEventListener('mouseleave', function() {
+    if (window.innerWidth > 768) scheduleClose();
+  });
+  panel.addEventListener('mouseenter', function() {
+    if (window.innerWidth > 768) clearTimeout(hoverTimeout);
+  });
+  panel.addEventListener('mouseleave', function() {
+    if (window.innerWidth > 768) scheduleClose();
+  });
+
+  if (toggle && links) {
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggle.classList.toggle('open');
+      links.classList.toggle('mobile-open');
+      panel.classList.remove('open');
+      trigger.classList.remove('active');
+    });
+  }
+})();
+</script>
 </body>
 </html>
