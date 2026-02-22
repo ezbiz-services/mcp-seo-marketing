@@ -4,6 +4,18 @@
   "title": "EzBiz SEO & Marketing Analysis",
   "description": "AI-powered SEO and marketing: keyword research, SERP analysis, and content optimization tools.",
   "version": "1.0.0",
+  "websiteUrl": "https://seo.ezbizservices.com",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/sjcripps/mcp-seo-marketing/main/static/icon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": ["200x200"]
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/sjcripps/mcp-seo-marketing",
+    "source": "github"
+  },
   "remotes": [
     {
       "type": "streamable-http",
