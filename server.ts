@@ -15,7 +15,7 @@ import { checkBacklinks } from "./tools/backlink-checker";
 import { optimizeContent } from "./tools/content-optimizer";
 
 const PORT = parseInt(process.env.MCP_PORT || "4201");
-const BASE_DIR = import.meta.dir;
+const BASE_DIR = import.meta.dir || process.cwd();
 
 // --- Page cache ---
 const pageCache: Record<string, string> = {};
@@ -118,14 +118,19 @@ function createMcpServer(): McpServer {
   return server;
 }
 
+// Export for Smithery tool scanning (no real credentials needed)
+export function createSandboxServer() {
+  return createMcpServer();
+}
+
 // --- Session management ---
 const transports: Record<
   string,
   { transport: WebStandardStreamableHTTPServerTransport; apiKey: string }
 > = {};
 
-// --- Bun HTTP server ---
-Bun.serve({
+// --- Bun HTTP server (guarded for Smithery scanner compatibility) ---
+if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN) Bun.serve({
   port: PORT,
   async fetch(req) {
     const url = new URL(req.url);
@@ -229,8 +234,8 @@ Bun.serve({
       }, { headers: corsHeaders });
     }
 
-    // MCP endpoint
-    if (url.pathname === "/mcp") {
+    // MCP endpoint — accept on /mcp and also on / for POST (Smithery/scanners)
+    if (url.pathname === "/mcp" || (url.pathname === "/" && req.method === "POST")) {
       const apiKey = req.headers.get("x-api-key") || url.searchParams.get("api_key");
 
       let authResult: { valid: boolean; error?: string; tier?: string; name?: string } = { valid: false };
@@ -377,7 +382,7 @@ Bun.serve({
   },
 });
 
-console.log(`MCP SEO & Marketing Analysis server running on port ${PORT}`);
+if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN) console.log(`MCP SEO & Marketing Analysis server running on port ${PORT}`);
 
 process.on("SIGINT", async () => {
   console.log("Shutting down...");
