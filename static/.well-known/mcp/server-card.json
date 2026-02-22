@@ -4,25 +4,61 @@
     "description": "AI-powered SEO and marketing tools via MCP. Keyword research, SERP analysis, backlink checking, and content optimization for any website.",
     "version": "1.0.0",
     "homepage": "https://seo.ezbizservices.com",
+    "repository": "https://github.com/sjcripps/mcp-seo-marketing",
+    "license": "MIT",
+    "icon": "https://raw.githubusercontent.com/sjcripps/mcp-seo-marketing/main/static/icon.svg",
     "transport": "streamable-http",
     "endpoint": "https://seo.ezbizservices.com/mcp"
   },
   "tools": [
     {
       "name": "keyword_research",
-      "description": "Research keyword opportunities — search volume indicators, difficulty estimates, related terms, and content suggestions."
+      "description": "Research keyword opportunities — search volume indicators, difficulty estimates, related terms, and content suggestions.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["seed_keyword"],
+        "properties": {
+          "seed_keyword": { "type": "string", "description": "Primary keyword or topic to research" },
+          "industry": { "type": "string", "description": "Business industry or niche for context" },
+          "location": { "type": "string", "description": "Target geographic location" }
+        }
+      }
     },
     {
       "name": "analyze_serp",
-      "description": "Analyze search engine results for a query — top ranking pages, content patterns, SERP features, and ranking opportunity assessment."
+      "description": "Analyze search engine results for a query — top ranking pages, content patterns, SERP features, and ranking opportunity assessment.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["query"],
+        "properties": {
+          "query": { "type": "string", "description": "Search query to analyze" },
+          "num_results": { "type": "number", "minimum": 1, "maximum": 10, "description": "Number of results to analyze (max 10)" }
+        }
+      }
     },
     {
       "name": "check_backlinks",
-      "description": "Analyze a website's backlink profile — referring domains, anchor text patterns, link quality indicators, and link building opportunities."
+      "description": "Analyze a website's backlink profile — referring domains, anchor text patterns, link quality indicators, and link building opportunities.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": { "type": "string", "description": "Website URL to analyze" },
+          "competitor_urls": { "type": "string", "description": "Comma-separated competitor URLs for comparison" }
+        }
+      }
     },
     {
       "name": "optimize_content",
-      "description": "Analyze and optimize content for SEO — keyword density, readability, structure, meta tags, and actionable improvement suggestions."
+      "description": "Analyze and optimize content for SEO — keyword density, readability, structure, meta tags, and actionable improvement suggestions.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["url", "target_keyword"],
+        "properties": {
+          "url": { "type": "string", "description": "URL of the page to optimize" },
+          "target_keyword": { "type": "string", "description": "Primary keyword to optimize for" }
+        }
+      }
     }
   ],
   "authentication": {
