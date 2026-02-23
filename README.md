@@ -47,7 +47,7 @@ AI-powered SEO and marketing intelligence tools via the [Model Context Protocol 
 ## Self-Hosting
 
 ```bash
-git clone https://github.com/sjcripps/mcp-seo-marketing.git
+git clone https://github.com/ezbiz-services/mcp-seo-marketing.git
 cd mcp-seo-marketing
 bun install
 

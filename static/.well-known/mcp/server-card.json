@@ -1,12 +1,12 @@
 {
   "serverInfo": {
     "name": "EzBiz SEO & Marketing Analysis",
-    "description": "AI-powered SEO and marketing tools via MCP. Keyword research, SERP analysis, backlink checking, and content optimization for any website.",
+    "description": "AI-powered SEO and marketing analysis MCP server for Claude, Cursor, Windsurf, and any MCP client. 4 tools: keyword research, SERP analysis, backlink checker, and content optimization. Get actionable SEO insights powered by GPT-4o in real time. Free tier available — 10 API calls/month. Perfect for content marketers, SEO professionals, and agencies. Built by EzBiz Services.",
     "version": "1.0.0",
     "homepage": "https://seo.ezbizservices.com",
-    "repository": "https://github.com/sjcripps/mcp-seo-marketing",
+    "repository": "https://github.com/ezbiz-services/mcp-seo-marketing",
     "license": "MIT",
-    "icon": "https://raw.githubusercontent.com/sjcripps/mcp-seo-marketing/main/static/icon.svg",
+    "icon": "https://raw.githubusercontent.com/ezbiz-services/mcp-seo-marketing/main/static/icon.svg",
     "transport": "streamable-http",
     "endpoint": "https://seo.ezbizservices.com/mcp"
   },

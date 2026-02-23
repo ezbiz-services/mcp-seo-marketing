@@ -1,19 +1,19 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "com.ezbizservices/seo-marketing",
+  "name": "io.github.sjcripps/seo-marketing",
   "title": "EzBiz SEO & Marketing Analysis",
-  "description": "AI-powered SEO and marketing: keyword research, SERP analysis, and content optimization tools.",
+  "description": "AI SEO toolkit: keyword research, SERP analysis, backlinks, content optimization",
   "version": "1.0.0",
   "websiteUrl": "https://seo.ezbizservices.com",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/sjcripps/mcp-seo-marketing/main/static/icon.svg",
+      "src": "https://raw.githubusercontent.com/ezbiz-services/mcp-seo-marketing/main/static/icon.svg",
       "mimeType": "image/svg+xml",
       "sizes": ["200x200"]
     }
   ],
   "repository": {
-    "url": "https://github.com/sjcripps/mcp-seo-marketing",
+    "url": "https://github.com/ezbiz-services/mcp-seo-marketing",
     "source": "github"
   },
   "remotes": [
