@@ -3,6 +3,7 @@ import { readFile } from "fs/promises";
 import { join } from "path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
 import { validateApiKey, recordUsage, createApiKey, getKeyByEmail, upgradeKey, getKeyUsage, TIER_LIMITS, TIER_PRICES } from "./lib/auth";
@@ -14,6 +15,9 @@ import { keywordResearch } from "./tools/keyword-research";
 import { analyzeSERP } from "./tools/serp-analysis";
 import { checkBacklinks } from "./tools/backlink-checker";
 import { optimizeContent } from "./tools/content-optimizer";
+// Pro/Business tier tools
+import { auditSite } from "./tools/site-audit";
+import { generateContentBrief } from "./tools/content-brief";
 
 const PORT = parseInt(process.env.MCP_PORT || "4201");
 const BASE_DIR = import.meta.dir || process.cwd();
@@ -32,7 +36,11 @@ const MIME_TYPES: Record<string, string> = {
 
 async function loadPage(name: string): Promise<string> {
   if (pageCache[name]) return pageCache[name];
-  const content = await readFile(join(BASE_DIR, "pages", name), "utf-8");
+  let content = await readFile(join(BASE_DIR, "pages", name), "utf-8");
+  content = content.replace(/style\.css\?v=\d+/g, 'style.css?v=3');
+  if (content.includes('</body>')) {
+    content = content.replace('</body>', '<script src="/static/nav.js"></script>\n</body>');
+  }
   pageCache[name] = content;
   return content;
 }
@@ -57,7 +65,7 @@ async function serveStatic(pathname: string): Promise<Response | null> {
 }
 
 // --- MCP Server factory ---
-function createMcpServer(): McpServer {
+function createMcpServer(tier: string = "free"): McpServer {
   const server = new McpServer({
     name: "ezbiz-seo-marketing",
     version: "1.0.0",
@@ -72,7 +80,7 @@ function createMcpServer(): McpServer {
       location: z.string().optional().describe("Target geographic location")
     },
     async (params) => {
-      const result = await keywordResearch(params);
+      const result = await keywordResearch({ ...params, tier });
       return { content: [{ type: "text", text: result }] };
     }
   );
@@ -85,7 +93,7 @@ function createMcpServer(): McpServer {
       num_results: z.number().optional().describe("Number of results to analyze (max 10)")
     },
     async (params) => {
-      const result = await analyzeSERP(params);
+      const result = await analyzeSERP({ ...params, tier });
       return { content: [{ type: "text", text: result }] };
     }
   );
@@ -98,7 +106,7 @@ function createMcpServer(): McpServer {
       competitor_urls: z.string().optional().describe("Comma-separated competitor URLs for comparison")
     },
     async (params) => {
-      const result = await checkBacklinks(params);
+      const result = await checkBacklinks({ ...params, tier });
       return { content: [{ type: "text", text: result }] };
     }
   );
@@ -111,7 +119,47 @@ function createMcpServer(): McpServer {
       target_keyword: z.string().describe("Primary keyword to optimize for")
     },
     async (params) => {
-      const result = await optimizeContent(params);
+      const result = await optimizeContent({ ...params, tier });
+      return { content: [{ type: "text", text: result }] };
+    }
+  );
+
+  // --- Pro/Business tier tools ---
+  const PRO_TIERS = ["pro", "business"];
+  const upgradeMsg = (toolName: string) =>
+    `🔒 ${toolName} requires a Pro or Business tier subscription.\n\nUpgrade at https://seo.ezbizservices.com/pricing to unlock advanced SEO tools including full site audits, content briefs, and more.`;
+
+  // Tool 5: Site Audit (Pro+)
+  server.tool(
+    "site_audit",
+    "🔒 [Pro] Full technical SEO audit of a website — crawls multiple pages, checks SSL, speed, schema, headings, linking structure, and provides a prioritized fix plan.",
+    {
+      url: z.string().describe("Website URL to audit (e.g., 'https://example.com')"),
+      focus: z.string().optional().describe("Specific audit focus (e.g., 'page speed', 'schema markup', 'mobile')")
+    },
+    async (params) => {
+      if (!PRO_TIERS.includes(tier)) {
+        return { content: [{ type: "text", text: upgradeMsg("Site Audit") }] };
+      }
+      const result = await auditSite({ ...params, tier });
+      return { content: [{ type: "text", text: result }] };
+    }
+  );
+
+  // Tool 6: Content Brief (Pro+)
+  server.tool(
+    "content_brief",
+    "🔒 [Pro] Generate a production-ready content brief — analyzes top-ranking pages, provides title options, full outline with word counts, keyword targets, and differentiation strategy.",
+    {
+      topic: z.string().describe("Content topic (e.g., 'best CRM for small businesses')"),
+      target_keyword: z.string().describe("Primary keyword to rank for"),
+      content_type: z.string().optional().describe("Content format (default: 'blog post', options: 'landing page', 'pillar page', 'comparison')")
+    },
+    async (params) => {
+      if (!PRO_TIERS.includes(tier)) {
+        return { content: [{ type: "text", text: upgradeMsg("Content Brief") }] };
+      }
+      const result = await generateContentBrief({ ...params, tier });
       return { content: [{ type: "text", text: result }] };
     }
   );
@@ -131,7 +179,14 @@ const transports: Record<
 > = {};
 
 // --- Bun HTTP server (guarded for Smithery scanner compatibility) ---
-if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN) Bun.serve({
+// --- Stdio transport for MCP inspectors (Glama, CLI clients) ---
+if (process.argv.includes("--stdio")) {
+  const server = createMcpServer("free");
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+}
+// --- Bun HTTP server (guarded for Smithery scanner compatibility) ---
+else if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN) Bun.serve({
   port: PORT,
   async fetch(req) {
     const url = new URL(req.url);
@@ -254,7 +309,33 @@ if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN) Bun.serve({
 
     // MCP endpoint — accept on /mcp and also on / for POST (Smithery/scanners)
     if (url.pathname === "/mcp" || (url.pathname === "/" && req.method === "POST")) {
-      // Accept API key from multiple sources for proxy compatibility (Smithery, Claude, etc.)
+      const sessionId = req.headers.get("mcp-session-id");
+
+      // --- GET/DELETE: session-based operations (SSE stream / session close) ---
+      // Part of the MCP Streamable HTTP protocol. Session was authenticated during POST.
+      if (req.method === "GET") {
+        if (sessionId && transports[sessionId]) {
+          console.log(`[MCP] GET SSE stream | session: ${sessionId}`);
+          return transports[sessionId].transport.handleRequest(req);
+        }
+        return Response.json(
+          { jsonrpc: "2.0", error: { code: -32000, message: "Bad request: GET requires a valid mcp-session-id. Start with POST." }, id: null },
+          { status: 400, headers: corsHeaders }
+        );
+      }
+
+      if (req.method === "DELETE") {
+        if (sessionId && transports[sessionId]) {
+          console.log(`[MCP] DELETE session | session: ${sessionId}`);
+          return transports[sessionId].transport.handleRequest(req);
+        }
+        return Response.json(
+          { jsonrpc: "2.0", error: { code: -32000, message: "Session not found" }, id: null },
+          { status: 404, headers: corsHeaders }
+        );
+      }
+
+      // --- POST: API key auth (accept from multiple sources for proxy compatibility) ---
       const bearerToken = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
       const apiKey =
         req.headers.get("x-api-key") ||
@@ -266,26 +347,12 @@ if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN) Bun.serve({
 
       // Debug logging
       const qp = url.search || "none";
-      console.log(`[MCP] ${req.method} ${url.pathname} | auth: ${bearerToken ? "Bearer " + bearerToken.slice(0, 12) + "..." : "none"} | x-api-key: ${req.headers.get("x-api-key") ? "yes" : "no"} | apikey-hdr: ${req.headers.get("apikey") ? "yes" : "no"} | query: ${qp} | session: ${req.headers.get("mcp-session-id") || "none"}`);
+      console.log(`[MCP] POST ${url.pathname} | auth: ${bearerToken ? "Bearer " + bearerToken.slice(0, 12) + "..." : "none"} | x-api-key: ${req.headers.get("x-api-key") ? "yes" : "no"} | apikey-hdr: ${req.headers.get("apikey") ? "yes" : "no"} | query: ${qp} | session: ${sessionId || "none"}`);
 
-      let authResult: { valid: boolean; error?: string; tier?: string; name?: string } = { valid: false };
-      let isDiscoveryRequest = false;
-
-      if (req.method === "POST" && !apiKey) {
-        try {
-          const cloned = req.clone();
-          const body = await cloned.json();
-          const method = body?.method;
-          if (method === "initialize" || method === "tools/list" || method === "notifications/initialized") {
-            isDiscoveryRequest = true;
-            authResult = { valid: true, tier: "discovery", name: "scanner" };
-          }
-        } catch {}
-      }
-
-      if (!isDiscoveryRequest) {
-        authResult = await validateApiKey(apiKey);
-      }
+      // Auth required on ALL MCP requests (including initialize).
+      // OAuth-capable clients get 401 + WWW-Authenticate → triggers OAuth 2.0 + PKCE flow.
+      // Scanners use /.well-known/mcp/server-card.json for tool discovery instead.
+      const authResult = await validateApiKey(apiKey);
 
       if (!authResult.valid) {
         return new Response(JSON.stringify({
@@ -296,14 +363,13 @@ if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN) Bun.serve({
             status: 401,
             headers: {
               "Content-Type": "application/json",
-              "WWW-Authenticate": `Bearer resource_metadata="https://seo.ezbizservices.com/.well-known/oauth-protected-resource"`,
               ...corsHeaders,
             },
           }
         );
       }
 
-      const sessionId = req.headers.get("mcp-session-id");
+      // Check for existing session (POST with session ID)
 
       if (sessionId && transports[sessionId]) {
         const { transport } = transports[sessionId];
@@ -345,7 +411,7 @@ if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN) Bun.serve({
             enableJsonResponse: true,
           });
 
-          const mcpServer = createMcpServer();
+          const mcpServer = createMcpServer(authResult.tier || "free");
           await mcpServer.connect(transport);
 
           if (apiKey) await recordUsage(apiKey);
@@ -440,7 +506,7 @@ if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN) Bun.serve({
   },
 });
 
-if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN) console.log(`MCP SEO & Marketing Analysis server running on port ${PORT}`);
+if (typeof Bun !== "undefined" && !process.env.SMITHERY_SCAN && !process.argv.includes("--stdio")) console.log(`MCP SEO & Marketing Analysis server running on port ${PORT}`);
 
 process.on("SIGINT", async () => {
   console.log("Shutting down...");
