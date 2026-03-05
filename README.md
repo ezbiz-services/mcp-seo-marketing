@@ -6,6 +6,10 @@
 
 AI-powered SEO and marketing intelligence tools via the [Model Context Protocol (MCP)](https://modelcontextprotocol.io). Give your AI assistant the ability to research keywords, analyze SERPs, check backlinks, and optimize content for search engines — all in real time.
 
+<a href="https://glama.ai/mcp/servers/@ezbiz-services/seo-marketing">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@ezbiz-services/seo-marketing/badge" alt="SEO Marketing MCP server" />
+</a>
+
 ## Tools
 
 | Tool | Description |
